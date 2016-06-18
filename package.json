@@ -1,0 +1,34 @@
+{
+  "name": "mm-services-kademlia",
+  "version": "0.5.0",
+  "description": "Kademlia DHT service for MicroMinion platform",
+  "main": "./src/index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MicroMinion/mm-services-kademlia.git"
+  },
+  "keywords": [
+    "kademlia",
+    "microminion",
+    "mm"
+  ],
+  "author": {
+    "name": "Thomas Delaet",
+    "email": "thomas@delaet.org"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MicroMinion/mm-services-kademlia/issues"
+  },
+  "homepage": "https://github.com/MicroMinion/mm-services-kademlia#readme",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "inherits": "^2.0.1",
+    "kad": "^1.5.13",
+    "kad-telemetry": "0.0.1",
+    "lodash": "^4.13.1",
+    "tweetnacl": "^0.14.3",
+    "tweetnacl-util": "^0.13.3"
+  }
+}
