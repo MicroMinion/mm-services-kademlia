@@ -1,9 +1,13 @@
 {
   "name": "mm-services-kademlia",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Kademlia DHT service for MicroMinion platform",
   "main": "./src/index.js",
-  "scripts": {},
+  "scripts": {
+    "check-updates": "npm-check",
+    "test": "echo",
+    "2npm": "publish"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MicroMinion/mm-services-kademlia.git"
@@ -30,5 +34,8 @@
     "lodash": "^4.13.1",
     "tweetnacl": "^0.14.3",
     "tweetnacl-util": "^0.13.3"
+  },
+  "devDependencies": {
+    "publish": "^0.6.0"
   }
 }
