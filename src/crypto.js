@@ -55,7 +55,7 @@ module.exports.verify = function (message, contact, next) {
   }
   var contract = nacl.hash(new Uint8Array(new Buffer(JSON.stringify(message))))
   signature = new Buffer(signature, 'hex')
-  var signId = nacl.util.decodeBase64(contact.connectionInfo.signId)
+  var signId = nacl.util.decodeBase64(contact.nodeInfo.signId)
   if (nacl.sign.detached.verify(contract, signature, signId)) {
     next()
   } else {
