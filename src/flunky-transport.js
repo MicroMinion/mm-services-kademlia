@@ -19,18 +19,18 @@ var FlunkyContact = function (options) {
   if (!(this instanceof FlunkyContact)) {
     return new FlunkyContact(options)
   }
-  this.connectionInfo = options
+  this.nodeInfo = options
   kademlia.Contact.call(this, options)
 }
 
 inherits(FlunkyContact, kademlia.Contact)
 
 FlunkyContact.prototype._createNodeID = function () {
-  return getNodeIdFromPublicKey(this.connectionInfo.signId)
+  return getNodeIdFromPublicKey(this.nodeInfo.signId)
 }
 
 FlunkyContact.prototype.toString = function () {
-  return this.connectionInfo.signId
+  return this.nodeInfo.signId
 }
 
 /* KADEMLIA TRANSPORT */
@@ -63,7 +63,10 @@ FlunkyTransport.prototype._send = function (data, contact) {
   data = JSON.parse(data.toString('utf8'))
   debug(data)
   debug(contact)
-  this.messaging.send('kademlia', contact.connectionInfo.signId, data, {realtime: true, expireAfter: 10000})
+  this.messaging.send('kademlia', contact.nodeInfo.signId, data, {
+    realtime: true,
+    expireAfter: 10000
+  })
 }
 
 FlunkyTransport.prototype._close = function () {}
@@ -71,8 +74,8 @@ FlunkyTransport.prototype._close = function () {}
 FlunkyTransport.prototype._createContact = function (options) {
   debug('_createContact')
   debug(options)
-  this.messaging.send('transports.connectionInfo', 'local', options.connectionInfo)
-  return new this._contact.constructor(options.connectionInfo)
+  this.messaging.send('transports.nodeInfo', 'local', options.nodeInfo)
+  return new this._contact.constructor(options.nodeInfo)
 }
 
 module.exports = {

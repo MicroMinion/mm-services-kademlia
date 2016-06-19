@@ -15,22 +15,22 @@ var KademliaService = function (options) {
   debug('initialize')
   this.messaging = options.platform.messaging
   this.storage = options.storage
-  this.myConnectionInfo = {}
+  this.myNodeInfo = {}
   this.online = false
   var self = this
-  this.messaging.on('self.transports.myConnectionInfo', this._updateConnectionInfo.bind(this))
+  this.messaging.on('self.transports.myNodeInfo', this._updateNodeInfo.bind(this))
   options.platform.on('ready', function () {
     self.keypair = options.platform.identity.sign
   })
 }
 
-KademliaService.prototype._updateConnectionInfo = function (topic, publicKey, data) {
-  debug('_updateConnectionInfo')
-  this.myConnectionInfo = data
+KademliaService.prototype._updateNodeInfo = function (topic, publicKey, data) {
+  debug('_updateNodeInfo')
+  this.myNodeInfo = data
   if (!this.dht) {
     this._setup()
   } else {
-    this.contact.connectionInfo = this.myConnectionInfo
+    this.contact.nodeInfo = this.myNodeInfo
     this.put('self.directory.put', 'local', {
       key: data.boxId,
       value: data.signId
@@ -42,9 +42,9 @@ KademliaService.prototype._setup = function () {
   debug('_setup')
   this.messaging.on('self.directory.get', this.get.bind(this))
   this.messaging.on('self.directory.put', this.put.bind(this))
-  this.messaging.on('self.transports.connectionInfoBootstrap', this.connect.bind(this))
-  this.messaging.on('self.transports.requestConnectionInfo', this.requestConnectionInfo.bind(this))
-  this.contact = new FlunkyContact(this.myConnectionInfo)
+  this.messaging.on('self.transports.nodeInfoBootstrap', this.connect.bind(this))
+  this.messaging.on('self.transports.requestNodeInfo', this.requestNodeInfo.bind(this))
+  this.contact = new FlunkyContact(this.myNodeInfo)
   // var TelemetryTransport = telemetry.TransportDecorator(FlunkyTransport)
   // var pathToTelemetryData = null
   // var transport = new TelemetryTransport(contact, {messaging: this.messaging, telemetry: {filename: pathToTelemetryData}})
@@ -67,27 +67,27 @@ KademliaService.prototype._setup = function () {
     service.online = true
   })
   this._setupSeeds()
-  this.messaging.send('transports.requestBootstrapConnectionInfo', 'local', {})
+  this.messaging.send('transports.requestBootstrapNodeInfo', 'local', {})
 }
 
 KademliaService.prototype.connect = function (topic, publicKey, data) {
   debug('connect')
   debug(data)
-  if (data.signId !== this.myConnectionInfo.signId) {
+  if (data.signId !== this.myNodeInfo.signId) {
     this.dht.connect(new FlunkyContact(data))
   }
 }
 
-KademliaService.prototype.requestConnectionInfo = function (topic, publicKey, data) {
-  debug('requestConnectionInfo')
+KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
+  debug('requestNodeInfo')
   debug(data)
   var signId = data
   var buckets = this.dht._router._buckets
   _.forEach(buckets, function (bucket) {
     _.forEach(bucket._contacts, function (contact) {
-      if (contact.connectionInfo.signId === signId) {
-        debug(contact.connectionInfo)
-        this.messaging.send('transports.connectionInfo', 'local', contact.connectionInfo)
+      if (contact.nodeInfo.signId === signId) {
+        debug(contact.nodeInfo)
+        this.messaging.send('transports.nodeInfo', 'local', contact.nodeInfo)
       }
     }, this)
   }, this)
@@ -133,18 +133,18 @@ KademliaService.prototype.put = function (topic, publicKey, data) {
 
 KademliaService.prototype._setupSeeds = function () {
   debug('_setupSeeds')
-  _.forEach(seeds, function (connectionInfo) {
-    this._setupSeed(connectionInfo)
+  _.forEach(seeds, function (nodeInfo) {
+    this._setupSeed(nodeInfo)
   }, this)
 }
 
-KademliaService.prototype._setupSeed = function (connectionInfo) {
+KademliaService.prototype._setupSeed = function (nodeInfo) {
   debug('_setupSeed')
-  debug(connectionInfo)
+  debug(nodeInfo)
   var self = this
-  this.messaging.send('transports.connectionInfo', 'local', connectionInfo)
+  this.messaging.send('transports.nodeInfo', 'local', nodeInfo)
   setImmediate(function () {
-    self.dht.connect(new FlunkyContact(connectionInfo))
+    self.dht.connect(new FlunkyContact(nodeInfo))
   })
 }
 
