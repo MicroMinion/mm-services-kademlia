@@ -1,9 +1,9 @@
 'use strict'
 
 var kademlia = require('kad')
-var debug = require('debug')('flunky-services:kademlia')
-var FlunkyTransport = require('./flunky-transport.js').FlunkyTransport
-var FlunkyContact = require('./flunky-transport.js').FlunkyContact
+var debug = require('debug')('mm-services:kademlia')
+var MMTransport = require('./mm-transport.js').MMTransport
+var MMContact = require('./mm-transport.js').MMContact
 var crypto = require('./crypto.js')
 var telemetry = require('kad-telemetry')
 
@@ -44,11 +44,11 @@ KademliaService.prototype._setup = function () {
   this.messaging.on('self.directory.put', this.put.bind(this))
   this.messaging.on('self.transports.nodeInfoBootstrap', this.connect.bind(this))
   this.messaging.on('self.transports.requestNodeInfo', this.requestNodeInfo.bind(this))
-  this.contact = new FlunkyContact(this.myNodeInfo)
-  // var TelemetryTransport = telemetry.TransportDecorator(FlunkyTransport)
+  this.contact = new MMContact(this.myNodeInfo)
+  // var TelemetryTransport = telemetry.TransportDecorator(MMTransport)
   // var pathToTelemetryData = null
   // var transport = new TelemetryTransport(contact, {messaging: this.messaging, telemetry: {filename: pathToTelemetryData}})
-  var transport = new FlunkyTransport(this.contact, {
+  var transport = new MMTransport(this.contact, {
     messaging: this.messaging
   })
   transport.before('serialize', crypto.sign.bind(null, this.keypair))
@@ -74,7 +74,7 @@ KademliaService.prototype.connect = function (topic, publicKey, data) {
   debug('connect')
   debug(data)
   if (data.signId !== this.myNodeInfo.signId) {
-    this.dht.connect(new FlunkyContact(data))
+    this.dht.connect(new MMContact(data))
   }
 }
 
@@ -144,7 +144,7 @@ KademliaService.prototype._setupSeed = function (nodeInfo) {
   var self = this
   this.messaging.send('transports.nodeInfo', 'local', nodeInfo)
   setImmediate(function () {
-    self.dht.connect(new FlunkyContact(nodeInfo))
+    self.dht.connect(new MMContact(nodeInfo))
   })
 }
 
