@@ -5,7 +5,7 @@ var debug = require('debug')('mm-services:kademlia')
 var MMTransport = require('./mm-transport.js').MMTransport
 var MMContact = require('./mm-transport.js').MMContact
 var crypto = require('./crypto.js')
-var telemetry = require('kad-telemetry')
+// var telemetry = require('kad-telemetry')
 
 var _ = require('lodash')
 
@@ -53,14 +53,13 @@ KademliaService.prototype._setup = function () {
   })
   transport.before('serialize', crypto.sign.bind(null, this.keypair))
   transport.before('receive', crypto.verify)
-  var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
-  var router = new TelemetryRouter({
-    transport: transport
-  })
+  // var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
+  // var router = new TelemetryRouter({
+  //  transport: transport
+  // })
   this.dht = new kademlia.Node({
     storage: this.storage,
-    transport: transport,
-    router: router
+    transport: transport
   })
   var service = this
   this.dht.once('connect', function () {
