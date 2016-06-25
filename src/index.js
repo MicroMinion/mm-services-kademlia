@@ -61,6 +61,7 @@ KademliaService.prototype._setup = function () {
     storage: this.storage,
     transport: transport
   })
+  this.dht._log.level = 3
   var service = this
   this.dht.once('connect', function () {
     service.online = true
