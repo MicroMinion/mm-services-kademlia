@@ -63,8 +63,9 @@ KademliaService.prototype._setup = function () {
   })
   this.dht._log.level = 3
   var service = this
-  this.dht.once('connect', function () {
+  this.dht.on('connect', function () {
     service.online = true
+    service._updateNodeInfo(null, null, service.myNodeInfo)
   })
   this._setupSeeds()
   this.messaging.send('transports.requestBootstrapNodeInfo', 'local', {})
