@@ -101,7 +101,7 @@ KademliaService.prototype.connect = function (topic, publicKey, data) {
 }
 
 KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
-  var signId = data
+  var boxId = data
   var buckets = this.dht._router._buckets
   _.forEach(buckets, function (bucket) {
     _.forEach(bucket._contacts, function (contact) {
