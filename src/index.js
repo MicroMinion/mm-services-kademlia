@@ -101,15 +101,16 @@ KademliaService.prototype.connect = function (topic, publicKey, data) {
 }
 
 KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
+  var self = this
   var boxId = data
   var buckets = this.dht._router._buckets
   _.forEach(buckets, function (bucket) {
     _.forEach(bucket._contacts, function (contact) {
       if (contact.nodeInfo.boxId === boxId) {
-        this.messaging.send('transports.nodeInfo', 'local', contact.nodeInfo)
+        self.messaging.send('transports.nodeInfo', 'local', contact.nodeInfo)
       }
-    }, this)
-  }, this)
+    })
+  })
 }
 
 KademliaService.prototype.get = function (topic, publicKey, key) {
