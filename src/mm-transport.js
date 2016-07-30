@@ -26,11 +26,11 @@ var MMContact = function (options) {
 inherits(MMContact, kademlia.Contact)
 
 MMContact.prototype._createNodeID = function () {
-  return getNodeIdFromPublicKey(this.nodeInfo.signId)
+  return getNodeIdFromPublicKey(this.nodeInfo.boxId)
 }
 
 MMContact.prototype.toString = function () {
-  return this.nodeInfo.signId
+  return this.nodeInfo.boxId
 }
 
 /* KADEMLIA TRANSPORT */
@@ -63,7 +63,7 @@ MMTransport.prototype._send = function (data, contact) {
   data = JSON.parse(data.toString('utf8'))
   debug(data)
   debug(contact)
-  this.messaging.send('kademlia', contact.nodeInfo.signId, data, {
+  this.messaging.send('kademlia', contact.nodeInfo.boxId, data, {
     realtime: true,
     expireAfter: 10000
   })

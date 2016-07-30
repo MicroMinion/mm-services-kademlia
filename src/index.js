@@ -11,7 +11,7 @@ var extend = require('extend.js')
 
 var _ = require('lodash')
 
-var seeds = {}
+var seeds = require('./bootstrap-nodes.js')
 
 var KademliaService = function (options) {
   var self = this
@@ -46,8 +46,8 @@ KademliaService.prototype._updateNodeInfo = function (topic, publicKey, data) {
   } else {
     this.contact.nodeInfo = this.myNodeInfo
     this.put('self.directory.put', 'local', {
-      key: data.boxId,
-      value: data.signId
+      key: data.signId,
+      value: data.boxId
     })
   }
 }
@@ -91,11 +91,11 @@ KademliaService.prototype._setup = function () {
 }
 
 KademliaService.prototype.connect = function (topic, publicKey, data) {
-  if (data.signId !== this.myNodeInfo.signId && _.indexOf(this._connectionsCache, data.signId) === -1) {
+  if (data.boxId !== this.myNodeInfo.boxId && _.indexOf(this._connectionsCache, data.boxId) === -1) {
     this._log.info('connecting to node', {
       nodeInfo: data
     })
-    this._connectionsCache.push(data.signId)
+    this._connectionsCache.push(data.boxId)
     this.dht.connect(new MMContact(data))
   }
 }
@@ -105,7 +105,7 @@ KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
   var buckets = this.dht._router._buckets
   _.forEach(buckets, function (bucket) {
     _.forEach(bucket._contacts, function (contact) {
-      if (contact.nodeInfo.signId === signId) {
+      if (contact.nodeInfo.boxId === boxId) {
         this.messaging.send('transports.nodeInfo', 'local', contact.nodeInfo)
       }
     }, this)
@@ -158,9 +158,10 @@ KademliaService.prototype.put = function (topic, publicKey, data) {
 }
 
 KademliaService.prototype._setupSeeds = function () {
+  var self = this
   _.forEach(seeds, function (nodeInfo) {
-    this._setupSeed(nodeInfo)
-  }, this)
+    self._setupSeed(nodeInfo)
+  })
 }
 
 KademliaService.prototype._setupSeed = function (nodeInfo) {
