@@ -1,6 +1,6 @@
 {
   "name": "mm-services-kademlia",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Kademlia DHT service for MicroMinion platform",
   "main": "./src/index.js",
   "scripts": {
@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/MicroMinion/mm-services-kademlia#readme",
   "dependencies": {
-    "debug": "^2.2.0",
     "extend.js": "0.0.2",
     "inherits": "^2.0.1",
     "kad": "^1.5.16",
