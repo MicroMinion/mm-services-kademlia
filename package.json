@@ -1,6 +1,6 @@
 {
   "name": "mm-services-kademlia",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Kademlia DHT service for MicroMinion platform",
   "main": "./src/index.js",
   "scripts": {
@@ -30,11 +30,11 @@
     "extend.js": "0.0.2",
     "inherits": "^2.0.1",
     "kad": "^1.5.16",
-    "lodash": "^4.14.1",
+    "lodash": "^4.14.2",
     "tweetnacl": "^0.14.3",
     "tweetnacl-util": "^0.13.3",
     "winston": "^2.2.0",
-    "winston-meta-wrapper": "^1.0.0"
+    "winston-meta-wrapper": "^1.1.0"
   },
   "devDependencies": {
     "publish": "^0.6.0"
