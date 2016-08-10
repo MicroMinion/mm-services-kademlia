@@ -73,8 +73,7 @@ KademliaService.prototype._setup = function () {
   // })
   var kademliaLogger = winstonWrapper(this._log)
   kademliaLogger.addMeta({
-    module: 'kad',
-    node: this.platform.identity.getSignId()
+    module: 'kad'
   })
   this.dht = new kademlia.Node({
     storage: this.storage,
