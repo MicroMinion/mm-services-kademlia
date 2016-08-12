@@ -19,6 +19,10 @@ var KademliaService = function (options) {
   if (!options.logger) {
     this._options.logger = winston
   }
+  if (!options.seeds) {
+    options.seeds = seeds
+  }
+  this.seeds = options.seeds
   this.messaging = options.platform.messaging
   this.platform = options.platform
   this.storage = options.storage
@@ -159,7 +163,7 @@ KademliaService.prototype.put = function (topic, publicKey, data) {
 
 KademliaService.prototype._setupSeeds = function () {
   var self = this
-  _.forEach(seeds, function (nodeInfo) {
+  _.forEach(this.seeds, function (nodeInfo) {
     self._setupSeed(nodeInfo)
   })
 }
