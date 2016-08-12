@@ -85,7 +85,7 @@ KademliaService.prototype._setup = function () {
     logger: kademliaLogger
   })
   var service = this
-  this.dht.on('connect', function () {
+  this.dht.once('connect', function () {
     service.online = true
     service._updateNodeInfo(null, null, service.myNodeInfo)
   })
