@@ -36,6 +36,7 @@ var KademliaService = function (options) {
   this.messaging.on('self.transports.myNodeInfo', this._updateNodeInfo.bind(this))
   if (options.platform.isReady()) {
     self.keypair = options.platform.identity.sign
+    this.messaging.send('transports.requestMyNodeInfo', 'local', {})
   } else {
     options.platform.on('ready', function () {
       self.keypair = options.platform.identity.sign
