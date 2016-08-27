@@ -26,6 +26,7 @@ var KademliaService = function (options) {
   this.messaging = options.platform.messaging
   this.platform = options.platform
   this.storage = options.storage
+  this.directoryStorage = options.directoryStorage
   this.telemetryStorage = options.telemetryStorage
   this.myNodeInfo = {}
   this._connectionsCache = []
@@ -33,7 +34,6 @@ var KademliaService = function (options) {
   this._log.addMeta({
     module: 'mm-kademlia-service'
   })
-  this.online = false
   this.messaging.on('self.transports.myNodeInfo', this._updateNodeInfo.bind(this))
   if (options.platform.isReady()) {
     self.keypair = options.platform.identity.sign
@@ -74,14 +74,22 @@ KademliaService.prototype._setup = function () {
     messaging: this.messaging,
     telemetry: { storage: this.telemetryStorage }
   })
-  // var transport = new MMTransport(this.contact, {messaging: this.messaging})
+  //var transport = new MMTransport(this.contact, {messaging: this.messaging})
   transport.before('serialize', crypto.sign.bind(null, this.keypair))
   transport.before('receive', crypto.verify)
   var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
   var router = new TelemetryRouter({
     transport: transport,
-    logger: kademliaLogger
+    logger: kademliaLogger,
+    storage: this.directoryStorage
   })
+  /*
+  var router = new kademlia.Router({
+    transport: transport,
+    logger: kademliaLogger,
+    storage: this.directoryStorage
+  })
+  */
   this.dht = new kademlia.Node({
     storage: this.storage,
     transport: transport,
@@ -89,8 +97,7 @@ KademliaService.prototype._setup = function () {
     router: router
   })
   var service = this
-  this.dht.once('connect', function () {
-    service.online = true
+  this.dht.once('join', function () {
     service._updateNodeInfo(null, null, service.myNodeInfo)
   })
   this._setupSeeds()
@@ -127,7 +134,7 @@ KademliaService.prototype.get = function (topic, publicKey, key) {
     key: key
   })
   var self = this
-  if (!this.online) {
+  if (!this.dht.connected) {
     this._log.warn('kad server not ready to retrieve values')
     return
   }
@@ -149,11 +156,11 @@ KademliaService.prototype.get = function (topic, publicKey, key) {
 KademliaService.prototype.put = function (topic, publicKey, data) {
   this._log.info('storing value', data)
   var self = this
-  if (!this.online) {
+  if (!this.dht.connected) {
     this._log.warn('kad server not ready to store values', data)
     return
   }
-  if (this.online) {
+  if (this.dht.connected) {
     var dataObject = data.value
     this.dht.put(data.key, dataObject, function (error) {
       if (error) {
