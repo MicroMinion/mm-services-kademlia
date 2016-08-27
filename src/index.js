@@ -7,7 +7,7 @@ var crypto = require('./crypto.js')
 var winston = require('winston')
 var winstonWrapper = require('winston-meta-wrapper')
 var extend = require('extend.js')
-// var telemetry = require('kad-telemetry')
+var telemetry = require('kad-telemetry')
 
 var _ = require('lodash')
 
@@ -26,6 +26,7 @@ var KademliaService = function (options) {
   this.messaging = options.platform.messaging
   this.platform = options.platform
   this.storage = options.storage
+  this.telemetryStorage = options.telemetryStorage
   this.myNodeInfo = {}
   this._connectionsCache = []
   this._log = winstonWrapper(this._options.logger)
@@ -64,26 +65,28 @@ KademliaService.prototype._setup = function () {
   this.messaging.on('self.transports.nodeInfoBootstrap', this.connect.bind(this))
   this.messaging.on('self.transports.requestNodeInfo', this.requestNodeInfo.bind(this))
   this.contact = new MMContact(this.myNodeInfo)
-  // var TelemetryTransport = telemetry.TransportDecorator(MMTransport)
-  // var pathToTelemetryData = null
-  // var transport = new TelemetryTransport(contact, {messaging: this.messaging, telemetry: {filename: pathToTelemetryData}})
-  var transport = new MMTransport(this.contact, {
-    messaging: this.messaging
-  })
-  transport.before('serialize', crypto.sign.bind(null, this.keypair))
-  transport.before('receive', crypto.verify)
-  // var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
-  // var router = new TelemetryRouter({
-  //  transport: transport
-  // })
   var kademliaLogger = winstonWrapper(this._log)
   kademliaLogger.addMeta({
     module: 'kad'
   })
+  var TelemetryTransport = telemetry.TransportDecorator(MMTransport)
+  var transport = new TelemetryTransport(this.contact, {
+    messaging: this.messaging,
+    telemetry: {storage: this.telemetryStorage }
+  })
+  //var transport = new MMTransport(this.contact, {messaging: this.messaging})
+  transport.before('serialize', crypto.sign.bind(null, this.keypair))
+  transport.before('receive', crypto.verify)
+  var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
+  var router = new TelemetryRouter({
+    transport: transport,
+    logger: kademliaLogger
+  })
   this.dht = new kademlia.Node({
     storage: this.storage,
     transport: transport,
-    logger: kademliaLogger
+    logger: kademliaLogger,
+    router: router
   })
   var service = this
   this.dht.once('connect', function () {
@@ -108,6 +111,8 @@ KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
   var self = this
   var boxId = data
   var buckets = this.dht._router._buckets
+  //TODO: Use getContactsByNodeId
+  //TODO: When result is null, use lookup() => (err,'VALUE',value) (err, 'NODE' shortlist)
   _.forEach(buckets, function (bucket) {
     _.forEach(bucket._contacts, function (contact) {
       if (contact.nodeInfo.boxId === boxId) {
