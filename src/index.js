@@ -72,9 +72,9 @@ KademliaService.prototype._setup = function () {
   var TelemetryTransport = telemetry.TransportDecorator(MMTransport)
   var transport = new TelemetryTransport(this.contact, {
     messaging: this.messaging,
-    telemetry: {storage: this.telemetryStorage }
+    telemetry: { storage: this.telemetryStorage }
   })
-  //var transport = new MMTransport(this.contact, {messaging: this.messaging})
+  // var transport = new MMTransport(this.contact, {messaging: this.messaging})
   transport.before('serialize', crypto.sign.bind(null, this.keypair))
   transport.before('receive', crypto.verify)
   var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
@@ -111,8 +111,8 @@ KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
   var self = this
   var boxId = data
   var buckets = this.dht._router._buckets
-  //TODO: Use getContactsByNodeId
-  //TODO: When result is null, use lookup() => (err,'VALUE',value) (err, 'NODE' shortlist)
+  // TODO: Use getContactsByNodeId
+  // TODO: When result is null, use lookup() => (err,'VALUE',value) (err, 'NODE' shortlist)
   _.forEach(buckets, function (bucket) {
     _.forEach(bucket._contacts, function (contact) {
       if (contact.nodeInfo.boxId === boxId) {
