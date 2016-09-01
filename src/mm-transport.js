@@ -1,10 +1,11 @@
 'use strict'
 
 var inherits = require('inherits')
-var kademlia = require('kad')
+var kademlia = require('kad-js')
 var crypto = require('crypto')
 var ms = require('ms')
 var assert = require('assert')
+var _ = require('lodash')
 
 var RESPONSE_TIMEOUT = ms('5s')
 
@@ -110,7 +111,9 @@ MMTransport.prototype.send = function (contact, message, callback) {
       self._send(message.serialize(), contact, function (err) {
         if (err) {
           self._log.warn('rpc call %s could not be send', message.id)
-          callback(new Error('RPC with ID `' + message.id + '` could not be send'))
+          if (callback) {
+            callback(new Error('RPC with ID `' + message.id + '` could not be send'))
+          }
           delete self._pendingCalls[message.id]
         }
       })

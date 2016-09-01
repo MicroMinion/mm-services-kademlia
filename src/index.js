@@ -1,13 +1,13 @@
 'use strict'
 
-var kademlia = require('kad')
+var kademlia = require('kad-js')
 var MMTransport = require('./mm-transport.js').MMTransport
 var MMContact = require('./mm-transport.js').MMContact
 var crypto = require('./crypto.js')
 var winston = require('winston')
 var winstonWrapper = require('winston-meta-wrapper')
 var extend = require('extend.js')
-var telemetry = require('kad-telemetry')
+var telemetry = require('kad-telemetry-js')
 
 var _ = require('lodash')
 
@@ -29,7 +29,6 @@ var KademliaService = function (options) {
   this.directoryStorage = options.directoryStorage
   this.telemetryStorage = options.telemetryStorage
   this.myNodeInfo = {}
-  this._connectionsCache = []
   this._log = winstonWrapper(this._options.logger)
   this._log.addMeta({
     module: 'mm-kademlia-service'
@@ -51,10 +50,6 @@ KademliaService.prototype._updateNodeInfo = function (topic, publicKey, data) {
     this._setup()
   } else {
     this.contact.nodeInfo = this.myNodeInfo
-    this.put('self.directory.put', 'local', {
-      key: data.signId,
-      value: data.boxId
-    })
   }
 }
 
@@ -74,22 +69,15 @@ KademliaService.prototype._setup = function () {
     messaging: this.messaging,
     telemetry: { storage: this.telemetryStorage }
   })
-  //var transport = new MMTransport(this.contact, {messaging: this.messaging})
-  transport.before('serialize', crypto.sign.bind(null, this.keypair))
-  transport.before('receive', crypto.verify)
+  // transport.before('serialize', crypto.sign.bind(null, this.keypair))
+  // transport.before('receive', crypto.verify)
   var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
   var router = new TelemetryRouter({
     transport: transport,
     logger: kademliaLogger,
     storage: this.directoryStorage
   })
-  /*
-  var router = new kademlia.Router({
-    transport: transport,
-    logger: kademliaLogger,
-    storage: this.directoryStorage
-  })
-  */
+  this._router = router
   this.dht = new kademlia.Node({
     storage: this.storage,
     transport: transport,
@@ -105,11 +93,10 @@ KademliaService.prototype._setup = function () {
 }
 
 KademliaService.prototype.connect = function (topic, publicKey, data) {
-  if (data.boxId !== this.myNodeInfo.boxId && _.indexOf(this._connectionsCache, data.boxId) === -1) {
+  if (data.boxId !== this.myNodeInfo.boxId) {
     this._log.info('connecting to node', {
       nodeInfo: data
     })
-    this._connectionsCache.push(data.boxId)
     this.dht.connect(new MMContact(data))
   }
 }
@@ -117,15 +104,13 @@ KademliaService.prototype.connect = function (topic, publicKey, data) {
 KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
   var self = this
   var boxId = data
-  var buckets = this.dht._router._buckets
-  // TODO: Use getContactsByNodeId
-  // TODO: When result is null, use lookup() => (err,'VALUE',value) (err, 'NODE' shortlist)
-  _.forEach(buckets, function (bucket) {
-    _.forEach(bucket._contacts, function (contact) {
-      if (contact.nodeInfo.boxId === boxId) {
-        self.messaging.send('transports.nodeInfo', 'local', contact.nodeInfo)
-      }
-    })
+  var contact = new MMContact({boxId: boxId})
+  this._router.getContactByNodeID(contact.nodeID, function (err, result) {
+    if (err) {
+      self._log.warn('Contact  ' + boxId + ' not found')
+    } else {
+      self.messaging.send('transport.nodeInfo', 'local', result.nodeInfo)
+    }
   })
 }
 
