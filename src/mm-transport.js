@@ -72,6 +72,11 @@ MMTransport.prototype._open = function (ready) {
 }
 
 MMTransport.prototype._onMessage = function (topic, publicKey, data) {
+  if(_.has(data, 'result')) {
+    data.result.__receivingBoxId = publicKey
+  } else if(_.has(data, 'params')) {
+    data.params.__receivingBoxId = publicKey
+  }
   data = new Buffer(JSON.stringify(data), 'utf8')
   this.receive(data)
 }

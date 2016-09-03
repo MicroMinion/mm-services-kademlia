@@ -13,6 +13,8 @@ var _ = require('lodash')
 
 var seeds = require('./bootstrap-nodes.js')
 
+var EXPIRE_TRESHOLD = 2 * 1000 * 60
+
 var KademliaService = function (options) {
   var self = this
   this._options = options
@@ -69,8 +71,11 @@ KademliaService.prototype._setup = function () {
     messaging: this.messaging,
     telemetry: { storage: this.telemetryStorage }
   })
-  // transport.before('serialize', crypto.sign.bind(null, this.keypair))
-  // transport.before('receive', crypto.verify)
+  transport.before('serialize', crypto.sign.bind(null, this.keypair))
+  transport.before('receive', crypto.verify)
+  transport.on('error', function(err) {
+    kademliaLogger.warn('RPC error raised, reason: %s', err.message)
+  })
   var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
   var router = new TelemetryRouter({
     transport: transport,
@@ -110,6 +115,9 @@ KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
       self._log.warn('Contact  ' + boxId + ' not found')
     } else {
       self.messaging.send('transport.nodeInfo', 'local', result.nodeInfo)
+      if(result.nodeInfo.expireTime && result.nodeInfo.expireTime + EXPIRE_TRESHOLD > Date.now()) {
+        self.dht.ping(result)
+      }
     }
   })
 }
