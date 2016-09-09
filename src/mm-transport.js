@@ -6,6 +6,7 @@ var crypto = require('crypto')
 var ms = require('ms')
 var assert = require('assert')
 var _ = require('lodash')
+var async = require('async')
 
 var RESPONSE_TIMEOUT = ms('5s')
 
@@ -66,7 +67,7 @@ MMTransport.prototype._open = function (ready) {
   this.messaging.on('self.kademlia', this._onMessage.bind(this))
   this.messaging.on('friends.kademlia', this._onMessage.bind(this))
   this.messaging.on('public.kademlia', this._onMessage.bind(this))
-  setImmediate(function () {
+  async.setImmediate(function () {
     ready()
   })
 }

@@ -8,10 +8,11 @@ var winston = require('winston')
 var winstonWrapper = require('winston-meta-wrapper')
 var extend = require('extend.js')
 var telemetry = require('kad-telemetry-js')
-
+var async = require('async')
 var _ = require('lodash')
 
-var seeds = require('./bootstrap-nodes.js')
+//var seeds = require('./bootstrap-nodes.js')
+var seeds = []
 
 var EXPIRE_TRESHOLD = 2 * 1000 * 60
 
@@ -99,7 +100,7 @@ KademliaService.prototype._setup = function () {
 
 KademliaService.prototype.connect = function (topic, publicKey, data) {
   if (data.boxId !== this.myNodeInfo.boxId) {
-    this._log.info('connecting to node', {
+    this._log.debug('connecting to node', {
       nodeInfo: data
     })
     this.dht.connect(new MMContact(data))
@@ -178,7 +179,7 @@ KademliaService.prototype._setupSeed = function (nodeInfo) {
   this._log.debug('connecting to seed', nodeInfo)
   var self = this
   this.messaging.send('transports.nodeInfo', 'local', nodeInfo)
-  setImmediate(function () {
+  async.setImmediate(function () {
     self.dht.connect(new MMContact(nodeInfo))
   })
 }

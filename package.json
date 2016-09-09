@@ -1,6 +1,6 @@
 {
   "name": "mm-services-kademlia",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Kademlia DHT service for MicroMinion platform",
   "main": "./src/index.js",
   "scripts": {
@@ -27,11 +27,12 @@
   },
   "homepage": "https://github.com/MicroMinion/mm-services-kademlia#readme",
   "dependencies": {
+    "async": "2.0.1",
     "ed2curve": "0.1.4",
     "extend.js": "0.0.2",
-    "inherits": "2.0.1",
-    "kad-js": "1.6.3",
-    "kad-telemetry-js": "0.1.3",
+    "inherits": "2.0.3",
+    "kad-js": "1.6.4",
+    "kad-telemetry-js": "0.1.4",
     "lodash": "4.15.0",
     "ms": "0.7.1",
     "tweetnacl": "0.14.3",
