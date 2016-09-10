@@ -11,7 +11,7 @@ var telemetry = require('kad-telemetry-js')
 var async = require('async')
 var _ = require('lodash')
 
-//var seeds = require('./bootstrap-nodes.js')
+// var seeds = require('./bootstrap-nodes.js')
 var seeds = []
 
 var EXPIRE_TRESHOLD = 2 * 1000 * 60
@@ -70,11 +70,13 @@ KademliaService.prototype._setup = function () {
   var TelemetryTransport = telemetry.TransportDecorator(MMTransport)
   var transport = new TelemetryTransport(this.contact, {
     messaging: this.messaging,
-    telemetry: { storage: this.telemetryStorage }
+    telemetry: {
+      storage: this.telemetryStorage
+    }
   })
   transport.before('serialize', crypto.sign.bind(null, this.keypair))
   transport.before('receive', crypto.verify)
-  transport.on('error', function(err) {
+  transport.on('error', function (err) {
     kademliaLogger.warn('RPC error raised, reason: %s', err.message)
   })
   var TelemetryRouter = telemetry.RouterDecorator(kademlia.Router)
@@ -110,13 +112,15 @@ KademliaService.prototype.connect = function (topic, publicKey, data) {
 KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
   var self = this
   var boxId = data
-  var contact = new MMContact({boxId: boxId})
+  var contact = new MMContact({
+    boxId: boxId
+  })
   this._router.getContactByNodeID(contact.nodeID, function (err, result) {
     if (err) {
       self._log.warn('Contact  ' + boxId + ' not found')
     } else {
       self.messaging.send('transport.nodeInfo', 'local', result.nodeInfo)
-      if(result.nodeInfo.expireTime && result.nodeInfo.expireTime + EXPIRE_TRESHOLD > Date.now()) {
+      if (result.nodeInfo.expireTime && result.nodeInfo.expireTime + EXPIRE_TRESHOLD > Date.now()) {
         self.dht.ping(result)
       }
     }

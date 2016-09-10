@@ -40,11 +40,11 @@ var getNodeIdFromPublicKey = function (publicKey) {
   return pubripe.toString('hex')
 }
 
-var nodeIdGeneratedFromBoxId = function(nodeId, boxId) {
+var nodeIdGeneratedFromBoxId = function (nodeId, boxId) {
   return nodeId === getNodeIdFromPublicKey(boxId)
 }
 
-var boxIdGeneratedFromSignId  = function(boxId, signId) {
+var boxIdGeneratedFromSignId = function (boxId, signId) {
   boxId = nacl.util.decodeBase64(boxId)
   signId = nacl.util.decodeBase64(signId)
   return _isEqual(ed2curve.convertPublicKey(signId), boxId)
@@ -63,7 +63,7 @@ var _isEqual = function (a, b) {
   return true
 }
 
-var boxIdMatch = function(connectionBoxId, contactBoxId) {
+var boxIdMatch = function (connectionBoxId, contactBoxId) {
   return connectionBoxId === contactBoxId
 }
 
@@ -89,13 +89,13 @@ module.exports.verify = function (message, contact, next) {
     receivingBoxId = message.result.__receivingBoxId
     delete message.result.__receivingBoxId
   }
-  if(!nodeIdGeneratedFromBoxId(contact.nodeID, contact.nodeInfo.boxId)) {
+  if (!nodeIdGeneratedFromBoxId(contact.nodeID, contact.nodeInfo.boxId)) {
     return next(new Error('NodeID not generated from SignID'))
   }
-  if(!boxIdGeneratedFromSignId(contact.nodeInfo.boxId, contact.nodeInfo.signId)) {
+  if (!boxIdGeneratedFromSignId(contact.nodeInfo.boxId, contact.nodeInfo.signId)) {
     return next(new Error('BoxID not generated from SignID'))
   }
-  if(!boxIdMatch(receivingBoxId, contact.nodeInfo.boxId)) {
+  if (!boxIdMatch(receivingBoxId, contact.nodeInfo.boxId)) {
     return next(new Error('BoxID from connection does not match Contact'))
   }
   if (Date.now() > (module.exports.NONCE_EXPIRE + nonce)) {
