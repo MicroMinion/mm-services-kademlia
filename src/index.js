@@ -70,6 +70,7 @@ KademliaService.prototype._setup = function () {
   var TelemetryTransport = telemetry.TransportDecorator(MMTransport)
   var transport = new TelemetryTransport(this.contact, {
     messaging: this.messaging,
+    logger: kademliaLogger,
     telemetry: {
       storage: this.telemetryStorage
     }
@@ -120,7 +121,7 @@ KademliaService.prototype.requestNodeInfo = function (topic, publicKey, data) {
       self._log.warn('Contact  ' + boxId + ' not found')
     } else {
       self.messaging.send('transport.nodeInfo', 'local', result.nodeInfo)
-      if (result.nodeInfo.expireTime && result.nodeInfo.expireTime + EXPIRE_TRESHOLD > Date.now()) {
+      if (result.nodeInfo.expireTime && result.nodeInfo.expireTime + EXPIRE_TRESHOLD < Date.now()) {
         self.dht.ping(result)
       }
     }
