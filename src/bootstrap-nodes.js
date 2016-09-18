@@ -14,7 +14,9 @@ module.exports = [{
       port: 5812
     }
   }]
-}, {
+}]
+/*
+, {
   boxId: 'lqADFQ7WIC2Xl1KZ2imh9u2XXmWTwS2j7gsQkIemDAA=',
   signId: 'qxxA1w7BO078c30pO+zZ24irlrHWFZlWjWF/vt3/HUc=',
   connectionInfo: [{
@@ -30,4 +32,5 @@ module.exports = [{
       port: 5812
     }
   }]
-}]
+}
+*/
