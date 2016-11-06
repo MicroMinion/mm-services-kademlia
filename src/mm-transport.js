@@ -1,7 +1,7 @@
 'use strict'
 
 var inherits = require('inherits')
-var kademlia = require('kad-js')
+var kademlia = require('./kad/index.js')
 var crypto = require('crypto')
 var ms = require('ms')
 var assert = require('assert')

@@ -4,7 +4,7 @@
  * @module kad-spartacus/hooks
  */
 
-var kademlia = require('kad-js')
+var kademlia = require('./kad/index.js')
 var nacl = require('tweetnacl')
 nacl.util = require('tweetnacl-util')
 var ed2curve = require('ed2curve')

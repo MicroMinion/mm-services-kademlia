@@ -1,13 +1,13 @@
 'use strict'
 
-var kademlia = require('kad-js')
+var kademlia = require('./kad/index.js')
 var MMTransport = require('./mm-transport.js').MMTransport
 var MMContact = require('./mm-transport.js').MMContact
 var crypto = require('./crypto.js')
 var winston = require('winston')
 var winstonWrapper = require('winston-meta-wrapper')
 var extend = require('extend.js')
-var telemetry = require('kad-telemetry-js')
+var telemetry = require('./telemetry/index.js')
 var async = require('async')
 var _ = require('lodash')
 
