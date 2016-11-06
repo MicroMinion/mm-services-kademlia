@@ -10,7 +10,7 @@ nacl.util = require('tweetnacl-util')
 var ed2curve = require('ed2curve')
 var crypto = require('crypto')
 
-module.exports.NONCE_EXPIRE = 10000 // 10 seconds
+module.exports.NONCE_EXPIRE = 1000 * 60 * 10 // 10 minutes
 
 /**
  * Used as a transport.before('serialize') hook

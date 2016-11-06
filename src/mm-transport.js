@@ -91,9 +91,14 @@ MMTransport.prototype.send = function (contact, message, callback) {
   assert(message instanceof kademlia.Message, 'Invalid message supplied')
 
   if (kademlia.Message.isRequest(message)) {
-    this._log.info('sending %s message to %j', message.method, contact)
+    this._log.info('sending message', {
+      method: message.method,
+      contact: contact
+    })
   } else {
-    this._log.info('replying to message to %s', message.id)
+    this._log.info('replying to message', {
+      id: message.id
+    })
   }
 
   this._trigger('before:serialize', [message], function () {
@@ -102,7 +107,9 @@ MMTransport.prototype.send = function (contact, message, callback) {
     self._trigger('after:serialize')
     self._trigger('before:send', [serialized, contact], function () {
       if (kademlia.Message.isRequest(message) && typeof callback === 'function') {
-        self._log.debug('queuing callback for reponse to %s', message.id)
+        self._log.debug('queuing callback for reponse', {
+          id: message.id
+        })
 
         self._pendingCalls[message.id] = {
           timestamp: Date.now(),
@@ -111,12 +118,16 @@ MMTransport.prototype.send = function (contact, message, callback) {
           message: message
         }
       } else {
-        self._log.debug('not waiting on callback for message %s', message.id)
+        self._log.debug('not waiting on callback for message', {
+          id: message.id
+        })
       }
 
       self._send(message.serialize(), contact, function (err) {
         if (err) {
-          self._log.warn('rpc call %s could not be send', message.id)
+          self._log.warn('rpc call could not be send', {
+            id: message.id
+          })
           if (callback) {
             callback(new Error('RPC with ID `' + message.id + '` could not be send'))
           }

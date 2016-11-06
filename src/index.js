@@ -11,8 +11,8 @@ var telemetry = require('kad-telemetry-js')
 var async = require('async')
 var _ = require('lodash')
 
-var seeds = require('./bootstrap-nodes.js')
-// var seeds = []
+// var seeds = require('./bootstrap-nodes.js')
+var seeds = []
 
 var EXPIRE_TRESHOLD = 2 * 1000 * 60
 
