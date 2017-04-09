@@ -21,7 +21,7 @@
     "name": "Thomas Delaet",
     "email": "thomas@delaet.org"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/MicroMinion/mm-services-kademlia/issues"
   },
